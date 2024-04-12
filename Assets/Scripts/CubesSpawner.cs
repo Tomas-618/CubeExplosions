@@ -12,6 +12,7 @@ public class CubesSpawner : MonoBehaviour
 
     private Transform _transform;
     private Vector3 _position;
+    private int _chanceOfSpawn;
 
     public int RandomCubesCount => Random.Range(_minCubesCount, _maxCubesCount + 1);
 
@@ -27,11 +28,15 @@ public class CubesSpawner : MonoBehaviour
     private void Start()
     {
         _transform = transform;
+        _chanceOfSpawn = RandomUtils.MaxPercent;
         SpawnInRandomRange();
     }
 
     public void SpawnAlongCircle(in Vector3 centerPosition, float radius)
     {
+        if (CanSpawnAlongCircle(_chanceOfSpawn) == false)
+            return;
+
         const int MaxAngle = 360;
 
         int cubesCount = RandomCubesCount;
@@ -45,6 +50,8 @@ public class CubesSpawner : MonoBehaviour
             return new Vector3(Mathf.Cos(angle), _spawnHeight, Mathf.Sin(angle)) * radius;
         }
 
+        _chanceOfSpawn /= 2;
+
         Spawn(SetCurrentCirclePosition, centerPosition, cubesCount);
     }
 
@@ -55,6 +62,9 @@ public class CubesSpawner : MonoBehaviour
 
         Spawn(SetRandomPosition, RandomCubesCount);
     }
+
+    private bool CanSpawnAlongCircle(in int chanceOfSpawn) =>
+        RandomUtils.IsSuccess(chanceOfSpawn);
 
     private void Spawn(System.Func<Vector3> vectorInfo, in int cubesCount)
     {
