@@ -10,7 +10,6 @@ public class InteractableCube : MonoBehaviour
 
     private void OnMouseDown()
     {
-        //float radius = _transform.localScale;
         float radius = 3;
 
         _spawner.SpawnAlongCircle(_transform.position, radius);
