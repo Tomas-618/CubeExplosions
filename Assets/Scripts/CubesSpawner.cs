@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class CubesSpawner : MonoBehaviour
@@ -13,6 +14,7 @@ public class CubesSpawner : MonoBehaviour
     private Transform _transform;
     private Vector3 _position;
     private int _chanceOfSpawn;
+    private int _cubeDivideFactor;
 
     public int RandomCubesCount => Random.Range(_minCubesCount, _maxCubesCount + 1);
 
@@ -29,6 +31,7 @@ public class CubesSpawner : MonoBehaviour
     {
         _transform = transform;
         _chanceOfSpawn = RandomUtils.MaxPercent;
+        _cubeDivideFactor = 2;
         SpawnInRandomRange();
     }
 
@@ -50,10 +53,11 @@ public class CubesSpawner : MonoBehaviour
             return new Vector3(Mathf.Cos(angle), _spawnHeight, Mathf.Sin(angle)) * radius;
         }
 
-        _chanceOfSpawn /= 2;
-        _entity.transform.localScale /= 2;
+        foreach (InteractableCube entity in Spawn(SetCurrentCirclePosition, centerPosition, cubesCount))
+            entity.transform.localScale /= _cubeDivideFactor;
 
-        Spawn(SetCurrentCirclePosition, centerPosition, cubesCount);
+        _chanceOfSpawn /= 2;
+        _cubeDivideFactor *= 2;
     }
 
     private void SpawnInRandomRange()
@@ -79,7 +83,7 @@ public class CubesSpawner : MonoBehaviour
         }
     }
 
-    private void Spawn(System.Func<int, Vector3> vectorInfo, in Vector3 origin, in int cubesCount)
+    private IEnumerable<InteractableCube> Spawn(System.Func<int, Vector3> vectorInfo, Vector3 origin, int cubesCount)
     {
         for (int i = 0; i < cubesCount; i++)
         {
@@ -91,6 +95,8 @@ public class CubesSpawner : MonoBehaviour
             InteractableCube entity = Instantiate(_entity, _position, Quaternion.identity);
 
             entity.Init(this);
+
+            yield return entity;
         }
     }
 }
