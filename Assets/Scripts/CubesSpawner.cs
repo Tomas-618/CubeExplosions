@@ -74,8 +74,8 @@ public class CubesSpawner : MonoBehaviour
         {
             _position = vectorInfo.Invoke(i);
 
-            _position.x = origin.x;
-            _position.z = origin.z;
+            _position.x += origin.x;
+            _position.z += origin.z;
 
             InteractableCube entity = Instantiate(_entity, _position, Quaternion.identity);
 
