@@ -51,6 +51,7 @@ public class CubesSpawner : MonoBehaviour
         }
 
         _chanceOfSpawn /= 2;
+        _entity.transform.localScale /= 2;
 
         Spawn(SetCurrentCirclePosition, centerPosition, cubesCount);
     }
