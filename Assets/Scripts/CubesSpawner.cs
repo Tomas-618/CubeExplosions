@@ -35,10 +35,10 @@ public class CubesSpawner : MonoBehaviour
         SpawnInRandomRange();
     }
 
-    public void SpawnAlongCircle(in Vector3 centerPosition, float radius)
+    public bool TrySpawnAlongCircle(in Vector3 centerPosition, float radius)
     {
         if (CanSpawnAlongCircle(_chanceOfSpawn) == false)
-            return;
+            return false;
 
         const int MaxAngle = 360;
 
@@ -58,6 +58,8 @@ public class CubesSpawner : MonoBehaviour
 
         _chanceOfSpawn /= 2;
         _cubeDivideFactor *= 2;
+
+        return true;
     }
 
     private void SpawnInRandomRange()
@@ -78,8 +80,6 @@ public class CubesSpawner : MonoBehaviour
             _position = vectorInfo.Invoke();
 
             InteractableCube entity = Instantiate(_entity, _transform.position + _position, Quaternion.identity);
-
-            entity.Init(this);
         }
     }
 
@@ -93,8 +93,6 @@ public class CubesSpawner : MonoBehaviour
             _position.z += origin.z;
 
             InteractableCube entity = Instantiate(_entity, _position, Quaternion.identity);
-
-            entity.Init(this);
 
             yield return entity;
         }

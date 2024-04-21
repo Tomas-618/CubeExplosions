@@ -1,26 +1,12 @@
-using System;
 using UnityEngine;
 
+[RequireComponent(typeof(Explodable))]
 public class InteractableCube : MonoBehaviour
 {
-    [SerializeField] private Explodable _explodable;
+    private Explodable _explodable;
 
-    private CubesSpawner _spawner;
-    private Transform _transform;
-
-    private void OnMouseDown()
-    {
-        float radius = 3;
-
-        _spawner.SpawnAlongCircle(_transform.position, radius);
-        _explodable.Explode();
-    }
+    public Explodable Explodable => _explodable;
 
     private void Start() =>
-        _transform = transform;
-
-    public void Init(CubesSpawner spawner) =>
-        _spawner = spawner ?? throw new ArgumentNullException(nameof(spawner));
-
-    
+        _explodable = GetComponent<Explodable>();
 }
