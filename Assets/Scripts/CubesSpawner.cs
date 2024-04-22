@@ -12,7 +12,6 @@ public class CubesSpawner : MonoBehaviour
     [SerializeField] private float _spawnHeight;
 
     private Transform _transform;
-    private Vector3 _position;
     private int _chanceOfSpawn;
     private int _cubeDivideFactor;
 
@@ -32,28 +31,18 @@ public class CubesSpawner : MonoBehaviour
         _transform = transform;
         _chanceOfSpawn = RandomUtils.MaxPercent;
         _cubeDivideFactor = 2;
-        SpawnInRandomRange();
+
+        SpawnInRandomRange(RandomCubesCount, _minPosition, _maxPosition);
     }
 
-    public bool TrySpawnAlongCircle(in Vector3 centerPosition, float radius)
+    public bool TrySpawnInPoint(Vector3 point)
     {
         if (CanSpawnAlongCircle(_chanceOfSpawn) == false)
             return false;
 
-        const int MaxAngle = 360;
+        int randomCubesCount = RandomCubesCount;
 
-        int cubesCount = RandomCubesCount;
-
-        float angleStep = MaxAngle / cubesCount * Mathf.Deg2Rad;
-
-        Vector3 SetCurrentCirclePosition(int currentStep)
-        {
-            float angle = angleStep * currentStep;
-
-            return new Vector3(Mathf.Cos(angle), _spawnHeight, Mathf.Sin(angle)) * radius;
-        }
-
-        foreach (InteractableCube entity in Spawn(SetCurrentCirclePosition, centerPosition, cubesCount))
+        foreach (InteractableCube entity in Spawn(point, randomCubesCount))
             entity.transform.localScale /= _cubeDivideFactor;
 
         _chanceOfSpawn /= 2;
@@ -62,37 +51,34 @@ public class CubesSpawner : MonoBehaviour
         return true;
     }
 
-    private void SpawnInRandomRange()
-    {
-        Vector3 SetRandomPosition() =>
-            new Vector3(Random.Range(_minPosition, _maxPosition), _spawnHeight, Random.Range(_minPosition, _maxPosition));
-
-        Spawn(SetRandomPosition, RandomCubesCount);
-    }
-
     private bool CanSpawnAlongCircle(in int chanceOfSpawn) =>
         RandomUtils.IsSuccess(chanceOfSpawn);
 
-    private void Spawn(System.Func<Vector3> vectorInfo, in int cubesCount)
+    private void SpawnInRandomRange(in int cubesCount, float minPosition, float maxPosition)
     {
-        for (int i = 0; i < cubesCount; i++)
-        {
-            _position = vectorInfo.Invoke();
-
-            InteractableCube entity = Instantiate(_entity, _transform.position + _position, Quaternion.identity);
-        }
+        Spawn(() => _transform.position + new Vector3(Random.Range(minPosition, maxPosition),
+            _spawnHeight,
+            Random.Range(minPosition, maxPosition)),
+            cubesCount);
     }
 
-    private IEnumerable<InteractableCube> Spawn(System.Func<int, Vector3> vectorInfo, Vector3 origin, int cubesCount)
+    private void Spawn(System.Func<Vector3> pointInfo, in int cubesCount)
     {
+        if (cubesCount < 0)
+            throw new System.ArgumentOutOfRangeException(cubesCount.ToString());
+
+        for (int i = 0; i < cubesCount; i++)
+            Instantiate(_entity, pointInfo.Invoke(), Quaternion.identity);
+    }
+
+    private IEnumerable<InteractableCube> Spawn(Vector3 point, int cubesCount)
+    {
+        if (cubesCount < 0)
+            throw new System.ArgumentOutOfRangeException(cubesCount.ToString());
+
         for (int i = 0; i < cubesCount; i++)
         {
-            _position = vectorInfo.Invoke(i);
-
-            _position.x += origin.x;
-            _position.z += origin.z;
-
-            InteractableCube entity = Instantiate(_entity, _position, Quaternion.identity);
+            InteractableCube entity = Instantiate(_entity, point, Quaternion.identity);
 
             yield return entity;
         }

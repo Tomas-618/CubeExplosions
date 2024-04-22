@@ -15,17 +15,16 @@ public class CameraRaycaster : MonoBehaviour
         if (Input.GetMouseButtonDown(0) == false)
             return;
 
-        if (Physics.Raycast(_camera.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo) == false)
-            return;
+        RaycastHit[] hitsInfo = Physics.RaycastAll(_camera.ScreenPointToRay(Input.mousePosition));
 
-        if (hitInfo.transform.TryGetComponent(out InteractableCube cube) == false)
+        InteractableCube cube = TryGetInteractableCube(hitsInfo);
+
+        if (cube == null)
             return;
 
         Transform cubeTransform = cube.transform;
 
-        int cubesSpawnRadius = 3;
-
-        if (_spawner.TrySpawnAlongCircle(cubeTransform.position, cubesSpawnRadius) == false)
+        if (_spawner.TrySpawnInPoint(cubeTransform.position) == false)
         {
             int impulseFactor = 8;
             int radiusFactor = 6;
@@ -33,5 +32,18 @@ public class CameraRaycaster : MonoBehaviour
             cube.Explodable.Explode(cubeTransform.localScale.magnitude * impulseFactor,
                 cubeTransform.localScale.magnitude * radiusFactor);
         }
+    }
+
+    private InteractableCube TryGetInteractableCube(in RaycastHit[] hitsInfo)
+    {
+        foreach (RaycastHit hitInfo in hitsInfo)
+        {
+            if (hitInfo.transform.TryGetComponent(out InteractableCube cube))
+            {
+                return cube;
+            }
+        }
+
+        return null;
     }
 }
