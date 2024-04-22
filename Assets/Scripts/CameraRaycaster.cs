@@ -1,11 +1,12 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
 public class CameraRaycaster : MonoBehaviour
 {
-    [SerializeField] private CubesSpawner _spawner;
-
     private Camera _camera;
+
+    public event Func<InteractableCube, bool> OnCubeHit;
 
     private void Start() =>
         _camera = GetComponent<Camera>();
@@ -15,26 +16,22 @@ public class CameraRaycaster : MonoBehaviour
         if (Input.GetMouseButtonDown(0) == false)
             return;
 
-        RaycastHit[] hitsInfo = Physics.RaycastAll(_camera.ScreenPointToRay(Input.mousePosition));
+        RaycastFromCursor(out InteractableCube cube);
 
-        InteractableCube cube = TryGetInteractableCube(hitsInfo);
-
-        if (cube == null)
+        if (cube == false)
             return;
 
-        Transform cubeTransform = cube.transform;
-
-        if (_spawner.TrySpawnInPoint(cubeTransform.position) == false)
-        {
-            int impulseFactor = 8;
-            int radiusFactor = 6;
-
-            cube.Explodable.Explode(cubeTransform.localScale.magnitude * impulseFactor,
-                cubeTransform.localScale.magnitude * radiusFactor);
-        }
+        OnCubeHit?.Invoke(cube);
     }
 
-    private InteractableCube TryGetInteractableCube(in RaycastHit[] hitsInfo)
+    private void RaycastFromCursor(out InteractableCube cube)
+    {
+        RaycastHit[] hitsInfo = Physics.RaycastAll(_camera.ScreenPointToRay(Input.mousePosition));
+
+        cube = GetCubeOrNull(hitsInfo);
+    }
+
+    private InteractableCube GetCubeOrNull(in RaycastHit[] hitsInfo)
     {
         foreach (RaycastHit hitInfo in hitsInfo)
         {

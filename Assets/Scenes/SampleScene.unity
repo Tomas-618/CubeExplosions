@@ -463,7 +463,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bc4272faf61e4c42aa036adc21aeb44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spawner: {fileID: 1950988741}
 --- !u!1 &1113020441
 GameObject:
   m_ObjectHideFlags: 0
@@ -723,6 +722,7 @@ GameObject:
   - component: {fileID: 1950988738}
   - component: {fileID: 1950988737}
   - component: {fileID: 1950988741}
+  - component: {fileID: 1950988742}
   m_Layer: 0
   m_Name: SpawnPlatform
   m_TagString: Untagged
@@ -831,6 +831,20 @@ MonoBehaviour:
   _minCubesCount: 2
   _maxCubesCount: 6
   _entity: {fileID: 6297946372155893630, guid: 534ea0e7cb9f2024eb913e843112a9ad, type: 3}
+  _raycaster: {fileID: 963194229}
   _minPosition: -5
   _maxPosition: 5
   _spawnHeight: 1
+--- !u!114 &1950988742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1950988736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f7b149b0334da94fb3c193a0b9f54a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _entity: {fileID: 1950988741}

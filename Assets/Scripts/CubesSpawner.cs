@@ -7,6 +7,7 @@ public class CubesSpawner : MonoBehaviour
     [SerializeField, Min(0)] private int _maxCubesCount;
 
     [SerializeField] private InteractableCube _entity;
+    [SerializeField] private CameraRaycaster _raycaster;
     [SerializeField] private float _minPosition;
     [SerializeField] private float _maxPosition;
     [SerializeField] private float _spawnHeight;
@@ -14,6 +15,8 @@ public class CubesSpawner : MonoBehaviour
     private Transform _transform;
     private int _chanceOfSpawn;
     private int _cubeDivideFactor;
+
+    public event System.Action<InteractableCube> OnFailToSpawnInCube;
 
     public int RandomCubesCount => Random.Range(_minCubesCount, _maxCubesCount + 1);
 
@@ -26,6 +29,12 @@ public class CubesSpawner : MonoBehaviour
             _maxPosition = _minPosition + 1;
     }
 
+    private void OnEnable() =>
+        _raycaster.OnCubeHit += TrySpawnInCube;
+
+    private void OnDisable() =>
+        _raycaster.OnCubeHit -= TrySpawnInCube;
+
     private void Start()
     {
         _transform = transform;
@@ -35,14 +44,18 @@ public class CubesSpawner : MonoBehaviour
         SpawnInRandomRange(RandomCubesCount, _minPosition, _maxPosition);
     }
 
-    public bool TrySpawnInPoint(Vector3 point)
+    public bool TrySpawnInCube(InteractableCube cube)
     {
         if (CanSpawnAlongCircle(_chanceOfSpawn) == false)
+        {
+            OnFailToSpawnInCube?.Invoke(cube);
+
             return false;
+        }
 
         int randomCubesCount = RandomCubesCount;
 
-        foreach (InteractableCube entity in Spawn(point, randomCubesCount))
+        foreach (InteractableCube entity in Spawn(cube.transform.position, randomCubesCount))
             entity.transform.localScale /= _cubeDivideFactor;
 
         _chanceOfSpawn /= 2;
