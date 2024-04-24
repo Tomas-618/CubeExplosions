@@ -828,9 +828,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f62f38d4aa6253e41a5a5fed226b5571, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _minCubesCount: 2
-  _maxCubesCount: 6
-  _entity: {fileID: 6297946372155893630, guid: 534ea0e7cb9f2024eb913e843112a9ad, type: 3}
+  _minCount: 2
+  _maxCount: 6
+  _entity: {fileID: 7733147848710951538, guid: 534ea0e7cb9f2024eb913e843112a9ad, type: 3}
   _raycaster: {fileID: 963194229}
   _minPosition: -5
   _maxPosition: 5
@@ -847,4 +847,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f7b149b0334da94fb3c193a0b9f54a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _entity: {fileID: 1950988741}
+  _entity: {fileID: 963194229}
