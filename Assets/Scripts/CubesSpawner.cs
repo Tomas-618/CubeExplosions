@@ -14,7 +14,6 @@ public class CubesSpawner : MonoBehaviour
 
     private Transform _transform;
     private int _chanceOfSpawn;
-    private int _divideFactor;
 
     public int RandomCount => Random.Range(_minCount, _maxCount + 1);
 
@@ -37,7 +36,6 @@ public class CubesSpawner : MonoBehaviour
     {
         _transform = transform;
         _chanceOfSpawn = RandomUtils.MaxPercent;
-        _divideFactor = 2;
 
         SpawnInRandomRange(RandomCount, _minPosition, _maxPosition);
     }
@@ -47,13 +45,18 @@ public class CubesSpawner : MonoBehaviour
         if (CanSpawnAlongCircle(_chanceOfSpawn) == false)
             return;
 
+        int divideFactor = 2;
+
         int randomCubesCount = RandomCount;
 
         foreach (ExplodableCube cube in Spawn(entity.transform.position, randomCubesCount))
-            cube.transform.localScale /= _divideFactor;
+        {
+            Vector3 newScale = entity.transform.localScale / divideFactor;
 
-        _chanceOfSpawn /= 2;
-        _divideFactor *= 2;
+            cube.transform.localScale = newScale;
+        }
+
+        _chanceOfSpawn /= divideFactor;
     }
 
     private bool CanSpawnAlongCircle(in int chanceOfSpawn) =>
