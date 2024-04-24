@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class Explodable : MonoBehaviour
+public class ExplodableCube : MonoBehaviour
 {
     private Rigidbody _rigidbody;
 

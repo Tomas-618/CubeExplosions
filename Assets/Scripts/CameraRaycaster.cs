@@ -6,7 +6,7 @@ public class CameraRaycaster : MonoBehaviour
 {
     private Camera _camera;
 
-    public event Func<InteractableCube, bool> OnCubeHit;
+    public event Action<ExplodableCube> HittedOnCube;
 
     private void Start() =>
         _camera = GetComponent<Camera>();
@@ -16,26 +16,26 @@ public class CameraRaycaster : MonoBehaviour
         if (Input.GetMouseButtonDown(0) == false)
             return;
 
-        RaycastFromCursor(out InteractableCube cube);
+        RaycastFromCursor(out ExplodableCube cube);
 
         if (cube == false)
             return;
 
-        OnCubeHit?.Invoke(cube);
+        HittedOnCube?.Invoke(cube);
     }
 
-    private void RaycastFromCursor(out InteractableCube cube)
+    private void RaycastFromCursor(out ExplodableCube cube)
     {
         RaycastHit[] hitsInfo = Physics.RaycastAll(_camera.ScreenPointToRay(Input.mousePosition));
 
         cube = GetCubeOrNull(hitsInfo);
     }
 
-    private InteractableCube GetCubeOrNull(in RaycastHit[] hitsInfo)
+    private ExplodableCube GetCubeOrNull(in RaycastHit[] hitsInfo)
     {
         foreach (RaycastHit hitInfo in hitsInfo)
         {
-            if (hitInfo.transform.TryGetComponent(out InteractableCube cube))
+            if (hitInfo.transform.TryGetComponent(out ExplodableCube cube))
             {
                 return cube;
             }

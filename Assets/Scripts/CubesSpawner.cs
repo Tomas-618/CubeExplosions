@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class CubesSpawner : MonoBehaviour
 {
-    [SerializeField, Min(0)] private int _minCubesCount;
-    [SerializeField, Min(0)] private int _maxCubesCount;
+    [SerializeField, Min(0)] private int _minCount;
+    [SerializeField, Min(0)] private int _maxCount;
 
-    [SerializeField] private InteractableCube _entity;
+    [SerializeField] private ExplodableCube _entity;
     [SerializeField] private CameraRaycaster _raycaster;
     [SerializeField] private float _minPosition;
     [SerializeField] private float _maxPosition;
@@ -14,54 +14,46 @@ public class CubesSpawner : MonoBehaviour
 
     private Transform _transform;
     private int _chanceOfSpawn;
-    private int _cubeDivideFactor;
+    private int _divideFactor;
 
-    public event System.Action<InteractableCube> OnFailToSpawnInCube;
-
-    public int RandomCubesCount => Random.Range(_minCubesCount, _maxCubesCount + 1);
+    public int RandomCount => Random.Range(_minCount, _maxCount + 1);
 
     private void OnValidate()
     {
-        if (_maxCubesCount <= _minCubesCount)
-            _maxCubesCount = _minCubesCount + 1;
+        if (_maxCount <= _minCount)
+            _maxCount = _minCount + 1;
 
         if (_maxPosition <= _minPosition)
             _maxPosition = _minPosition + 1;
     }
 
     private void OnEnable() =>
-        _raycaster.OnCubeHit += TrySpawnInCube;
+        _raycaster.HittedOnCube += TrySpawnInEntity;
 
     private void OnDisable() =>
-        _raycaster.OnCubeHit -= TrySpawnInCube;
+        _raycaster.HittedOnCube -= TrySpawnInEntity;
 
     private void Start()
     {
         _transform = transform;
         _chanceOfSpawn = RandomUtils.MaxPercent;
-        _cubeDivideFactor = 2;
+        _divideFactor = 2;
 
-        SpawnInRandomRange(RandomCubesCount, _minPosition, _maxPosition);
+        SpawnInRandomRange(RandomCount, _minPosition, _maxPosition);
     }
 
-    public bool TrySpawnInCube(InteractableCube cube)
+    public void TrySpawnInEntity(ExplodableCube entity)
     {
         if (CanSpawnAlongCircle(_chanceOfSpawn) == false)
-        {
-            OnFailToSpawnInCube?.Invoke(cube);
+            return;
 
-            return false;
-        }
+        int randomCubesCount = RandomCount;
 
-        int randomCubesCount = RandomCubesCount;
-
-        foreach (InteractableCube entity in Spawn(cube.transform.position, randomCubesCount))
-            entity.transform.localScale /= _cubeDivideFactor;
+        foreach (ExplodableCube cube in Spawn(entity.transform.position, randomCubesCount))
+            cube.transform.localScale /= _divideFactor;
 
         _chanceOfSpawn /= 2;
-        _cubeDivideFactor *= 2;
-
-        return true;
+        _divideFactor *= 2;
     }
 
     private bool CanSpawnAlongCircle(in int chanceOfSpawn) =>
@@ -84,14 +76,14 @@ public class CubesSpawner : MonoBehaviour
             Instantiate(_entity, pointInfo.Invoke(), Quaternion.identity);
     }
 
-    private IEnumerable<InteractableCube> Spawn(Vector3 point, int cubesCount)
+    private IEnumerable<ExplodableCube> Spawn(Vector3 point, int cubesCount)
     {
         if (cubesCount < 0)
             throw new System.ArgumentOutOfRangeException(cubesCount.ToString());
 
         for (int i = 0; i < cubesCount; i++)
         {
-            InteractableCube entity = Instantiate(_entity, point, Quaternion.identity);
+            ExplodableCube entity = Instantiate(_entity, point, Quaternion.identity);
 
             yield return entity;
         }
